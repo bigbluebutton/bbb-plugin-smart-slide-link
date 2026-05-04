@@ -9,12 +9,12 @@ A brief description of the plugin including a screenshot and/or a short video.
 To build the plugin for production use, follow these steps:
 
 ```bash
-cd $HOME/src/bbb-plugin-template
+cd $HOME/src/bbb-plugin-smart-slide-link
 npm ci
 npm run build-bundle
 ```
 
-The above command will generate the `dist` folder, containing the bundled JavaScript file named `BbbPluginTemplate.js`. This file can be hosted on any HTTPS server along with its `manifest.json`.
+The above command will generate the `dist` folder, containing the bundled JavaScript file named `BbbPluginSmartSlideLink.js`. This file can be hosted on any HTTPS server along with its `manifest.json`.
 
 If you install the Plugin separated to the manifest, remember to change the `javascriptEntrypointUrl` in the `manifest.json` to the correct endpoint.
 
