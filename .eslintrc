@@ -40,5 +40,14 @@
     },
     "globals": {
       "browser": "writable"
-    }
+    },
+    "overrides": [
+      {
+        "files": ["**/*.test.ts", "**/*.test.tsx"],
+        "env": { "jest": true },
+        "rules": {
+          "import/no-extraneous-dependencies": ["warn", { "devDependencies": true }]
+        }
+      }
+    ]
   }
