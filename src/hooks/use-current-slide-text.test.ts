@@ -1,4 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react';
+import type { PluginApi } from 'bigbluebutton-html-plugin-sdk';
 import useCurrentSlideText from './use-current-slide-text';
 
 // PluginApi is used only as a TS type in the hook, so we pass plain mock objects.
@@ -24,14 +25,14 @@ describe('useCurrentSlideText', () => {
   describe('when presentation data is unavailable', () => {
     it('returns null when presentation data is undefined', () => {
       const pluginApi = { useCurrentPresentation: jest.fn(() => ({ data: undefined })) };
-      const { result } = renderHook(() => useCurrentSlideText(pluginApi as any));
+      const { result } = renderHook(() => useCurrentSlideText(pluginApi as unknown as PluginApi));
       expect(result.current).toBeNull();
       expect(global.fetch).not.toHaveBeenCalled();
     });
 
     it('returns null when useCurrentPresentation is not present on the api (optional chaining)', () => {
       // The hook uses ?. so a missing method falls back to { data: undefined }
-      const { result } = renderHook(() => useCurrentSlideText({} as any));
+      const { result } = renderHook(() => useCurrentSlideText({} as unknown as PluginApi));
       expect(result.current).toBeNull();
     });
 
@@ -41,7 +42,7 @@ describe('useCurrentSlideText', () => {
           data: { currentPage: { urlsJson: { text: undefined } } },
         })),
       };
-      const { result } = renderHook(() => useCurrentSlideText(pluginApi as any));
+      const { result } = renderHook(() => useCurrentSlideText(pluginApi as unknown as PluginApi));
       expect(result.current).toBeNull();
       expect(global.fetch).not.toHaveBeenCalled();
     });
@@ -54,7 +55,7 @@ describe('useCurrentSlideText', () => {
       });
       const pluginApi = makePluginApi('https://bbb.example.com/slide.txt');
 
-      const { result } = renderHook(() => useCurrentSlideText(pluginApi as any));
+      const { result } = renderHook(() => useCurrentSlideText(pluginApi as unknown as PluginApi));
 
       await waitFor(() => expect(result.current).toBe('Hello slide'));
       expect(global.fetch).toHaveBeenCalledWith('https://bbb.example.com/slide.txt');
@@ -64,7 +65,7 @@ describe('useCurrentSlideText', () => {
       (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
       const pluginApi = makePluginApi('https://bbb.example.com/slide.txt');
 
-      const { result } = renderHook(() => useCurrentSlideText(pluginApi as any));
+      const { result } = renderHook(() => useCurrentSlideText(pluginApi as unknown as PluginApi));
 
       await waitFor(() => expect(global.fetch).toHaveBeenCalled());
       expect(result.current).toBeNull();
@@ -82,7 +83,9 @@ describe('useCurrentSlideText', () => {
         })),
       };
 
-      const { result, rerender } = renderHook(() => useCurrentSlideText(pluginApi as any));
+      const { result, rerender } = renderHook(
+        () => useCurrentSlideText(pluginApi as unknown as PluginApi),
+      );
 
       await waitFor(() => expect(result.current).toBe('Slide 1'));
 
@@ -105,7 +108,9 @@ describe('useCurrentSlideText', () => {
         })),
       };
 
-      const { result, rerender } = renderHook(() => useCurrentSlideText(pluginApi as any));
+      const { result, rerender } = renderHook(
+        () => useCurrentSlideText(pluginApi as unknown as PluginApi),
+      );
       await waitFor(() => expect(result.current).toBe('Slide text'));
 
       currentUri = undefined;

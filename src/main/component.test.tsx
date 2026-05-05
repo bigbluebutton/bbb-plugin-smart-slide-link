@@ -11,11 +11,9 @@ jest.mock('bigbluebutton-html-plugin-sdk', () => ({
     initialize: jest.fn(),
     getPluginApi: jest.fn(),
   },
-  // Implement as a constructor so `new PresentationToolbarButton(props)` records calls
-  // and produces a plain object with the same props.
-  PresentationToolbarButton: jest.fn().mockImplementation(function (this: any, props: any) {
-    Object.assign(this, props);
-  }),
+  PresentationToolbarButton: jest.fn().mockImplementation(
+    (props: ConstructorParameters<typeof PresentationToolbarButton>[0]) => ({ ...props }),
+  ),
 }));
 
 jest.mock('../hooks/use-current-slide-text');
