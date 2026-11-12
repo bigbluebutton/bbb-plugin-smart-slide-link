@@ -3,12 +3,14 @@
         "outDir": "./dist-tsc/",
         "noImplicitAny": true,
         "strictNullChecks": true,
-        "module": "es6",
-        "target": "es5",
+        "module": "esnext",
+        "target": "es2017",
         "jsx": "react",
         "allowJs": true,
-        "moduleResolution": "node",
-        "skipLibCheck": true
+        "moduleResolution": "bundler",
+        "skipLibCheck": true,
+        "types": ["node"],
+        "rootDir": "./src"
     },
     "include": ["src/*"],
     "paths": {

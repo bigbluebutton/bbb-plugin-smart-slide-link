@@ -1,6 +1,15 @@
 {
-  "requiredSdkVersion": "~0.0.73",
+  "requiredSdkVersion": "~1.0.0-beta.3",
   "name": "BbbPluginSmartSlideLink",
   "javascriptEntrypointUrl": "BbbPluginSmartSlideLink.js",
-  "localesBaseUrl": "locales"
+  "localesBaseUrl": "locales",
+  "settingsSchema": [
+    {
+      "name": "debug",
+      "label": "Enable debug logs",
+      "required": false,
+      "defaultValue": false,
+      "type": "boolean"
+    }
+  ]
 }

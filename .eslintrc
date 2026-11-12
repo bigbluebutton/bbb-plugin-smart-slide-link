@@ -43,10 +43,9 @@
     },
     "overrides": [
       {
-        "files": ["**/*.test.ts", "**/*.test.tsx"],
-        "env": { "jest": true },
+        "files": ["tests/**/*.{ts,tsx}", "*.config.ts", "*.config.mts"],
         "rules": {
-          "import/no-extraneous-dependencies": ["warn", { "devDependencies": true }]
+          "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
         }
       }
     ]

@@ -8,3 +8,8 @@ debian/**/copyright
 debian/**/changelog.gz
 debian/**/md5sums
 debian/**/var/www/*
+playwright-report
+test-results
+blob-report
+.env
+coverage
