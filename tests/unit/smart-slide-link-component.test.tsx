@@ -61,7 +61,7 @@ describe('SmartSlideLink', () => {
       expect(setPresentationToolbarItems).toHaveBeenCalledWith([]);
     });
 
-    it('registers one button per link, in order, with an index-based data-test', () => {
+    it('registers one button per link, in order, labelled with the link label and its site', () => {
       vi.mocked(useSmartSlideLinks).mockReturnValue([
         { url: 'https://a.com', label: 'A' },
         { url: 'https://b.com', label: 'B' },
@@ -69,8 +69,8 @@ describe('SmartSlideLink', () => {
       render(<SmartSlideLink pluginUuid="test-uuid" />);
 
       expect(PresentationToolbarButton).toHaveBeenCalledTimes(2);
-      expect(buttonProps(0)).toMatchObject({ label: 'A', dataTest: 'smartSlideLinkButton-0' });
-      expect(buttonProps(1)).toMatchObject({ label: 'B', dataTest: 'smartSlideLinkButton-1' });
+      expect(buttonProps(0)).toMatchObject({ label: 'A ↗ a.com', dataTest: 'smartSlideLinkButton-0' });
+      expect(buttonProps(1)).toMatchObject({ label: 'B ↗ b.com', dataTest: 'smartSlideLinkButton-1' });
       const [buttons] = setPresentationToolbarItems.mock.calls[0];
       expect(buttons).toHaveLength(2);
     });
@@ -103,7 +103,7 @@ describe('SmartSlideLink', () => {
       rerender(<SmartSlideLink pluginUuid="test-uuid" />);
 
       expect(setPresentationToolbarItems).toHaveBeenCalledTimes(2);
-      expect(buttonProps(0)).toMatchObject({ label: 'New' });
+      expect(buttonProps(0)).toMatchObject({ label: 'New ↗ new.com' });
     });
 
     it('opens its own link, safely, when a button is clicked', () => {

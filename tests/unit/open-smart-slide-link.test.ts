@@ -5,6 +5,7 @@ import { pluginLogger } from 'bigbluebutton-html-plugin-sdk';
 import {
   authenticateUrl,
   buildToolbarButtonDataTest,
+  buildToolbarButtonLabel,
   isSafeUrl,
   openSmartSlideLink,
 } from '../../src/components/smart-slide-link/service';
@@ -41,6 +42,9 @@ describe('isSafeUrl', () => {
     ['javascript:alert(1)', false],
     ['ftp://example.com', false],
     ['', false],
+    ['https://bigbluebutton.org@evil.example/', false],
+    ['https://user:pass@example.com/', false],
+    [`https://example.com/${'a'.repeat(3000)}`, false],
   ])('isSafeUrl(%j) is %s', (url, expected) => {
     expect(isSafeUrl(url)).toBe(expected);
   });
@@ -74,5 +78,23 @@ describe('buildToolbarButtonDataTest', () => {
   it('builds a stable, index-based data-test per button', () => {
     expect(buildToolbarButtonDataTest(0)).toBe('smartSlideLinkButton-0');
     expect(buildToolbarButtonDataTest(3)).toBe('smartSlideLinkButton-3');
+  });
+});
+
+describe('buildToolbarButtonLabel', () => {
+  it('shows the site the link opens next to the label', () => {
+    expect(buildToolbarButtonLabel({ url: 'https://example.com/docs?x=1', label: 'Open docs' }))
+      .toBe('Open docs ↗ example.com');
+  });
+
+  it('includes a non-default port', () => {
+    expect(buildToolbarButtonLabel({ url: 'http://localhost:8080/', label: 'Admin' }))
+      .toBe('Admin ↗ localhost:8080');
+  });
+
+  it('shows a look-alike international host name as punycode', () => {
+    // The first letter is a Cyrillic "а", not a Latin "a".
+    expect(buildToolbarButtonLabel({ url: new URL('https://аpple.com/').href, label: 'Apple' }))
+      .toBe('Apple ↗ xn--pple-43d.com');
   });
 });

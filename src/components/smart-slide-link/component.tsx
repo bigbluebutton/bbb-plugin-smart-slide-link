@@ -8,7 +8,7 @@ import {
 import { useDebugSetting, usePluginIntl, useUsageLogging } from '../../commons/hooks';
 import { useCurrentSlideText, useSmartSlideLinks } from './hooks';
 import intlMessages from './intl-messages';
-import { buildToolbarButtonDataTest, openSmartSlideLink } from './service';
+import { buildToolbarButtonDataTest, buildToolbarButtonLabel, openSmartSlideLink } from './service';
 import { SmartSlideLinkProps } from './types';
 
 function SmartSlideLink({ pluginUuid }: SmartSlideLinkProps): React.ReactElement | null {
@@ -24,7 +24,7 @@ function SmartSlideLink({ pluginUuid }: SmartSlideLinkProps): React.ReactElement
 
   useEffect(() => {
     const toolbarButtons = links.map((link, index) => new PresentationToolbarButton({
-      label: link.label,
+      label: buildToolbarButtonLabel(link),
       tooltip: intl ? intl.formatMessage(intlMessages.linkTooltip, { url: link.url }) : link.url,
       dataTest: buildToolbarButtonDataTest(index),
       onClick: () => openSmartSlideLink(link),

@@ -17,10 +17,16 @@ BBB{"links": [
 ```
 
 - Only `http:` and `https:` urls become buttons; anything else (`javascript:`, `data:`,
-  relative paths…) is ignored.
+  relative paths…) is ignored, and so are urls with a user name or password in them
+  (`https://user@host/`) or longer than 2048 characters.
+- Each button shows the link's label followed by the site it opens, e.g. `Open docs ↗
+  example.com`. Slide text can hold links the presenter cannot see on the slide, so the
+  destination is always visible before clicking.
+- A slide shows at most 10 links, and labels longer than 40 characters are cut short.
+  Invisible and text-direction control characters are removed from labels.
 - Links open with `noopener,noreferrer`, so the opened page has no access to the meeting.
 - The presentation toolbar is shown to the presenter only, so only the presenter sees the
-  buttons.
+  buttons, and only the presenter's client reads the slide text.
 - Slide text is read the way BigBlueButton extracts it (pdftotext), so the JSON must use
   plain straight quotes (`"`). Office apps that auto-replace them with typographic quotes
   (`“ ”`) produce text the plugin cannot parse.
