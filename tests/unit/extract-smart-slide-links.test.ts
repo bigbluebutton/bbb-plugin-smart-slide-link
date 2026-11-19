@@ -180,6 +180,41 @@ describe('extractSmartSlideLinks', () => {
       const text = 'BBB{"links":[{"url":"https://example.com","label":" \u200B\u202E "}]}';
       expect(extractSmartSlideLinks(text)).toEqual([]);
     });
+
+    it('replaces dashes in the label with spaces', () => {
+      // A label must not be able to fake the "label \u2014 open url" form of a tooltip.
+      const text = 'BBB{"links":[{"url":"https://example.com","label":"Pay \\u2014 open \\u2013 now"}]}';
+      expect(extractSmartSlideLinks(text)).toEqual([{ url: 'https://example.com/', label: 'Pay open now' }]);
+    });
+
+    it('removes the external link separator and other arrows from the label', () => {
+      // A label must not be able to fake the "label ↗ site" form of a button.
+      const text = 'BBB{"links":[{"url":"https://example.com","label":"Pay tuition \\u2197 paypal.com \\u2192 \\u27A1 \\u2B95"}]}';
+      expect(extractSmartSlideLinks(text)).toEqual([{ url: 'https://example.com/', label: 'Pay tuition paypal.com' }]);
+    });
+
+    it('filters out entries whose label is only arrows', () => {
+      const text = 'BBB{"links":[{"url":"https://example.com","label":"\\u2197\\u2192"}]}';
+      expect(extractSmartSlideLinks(text)).toEqual([]);
+    });
+
+    it('filters out entries whose label is only characters that render as blank', () => {
+      const text = 'BBB{"links":[{"url":"https://example.com","label":"\\u3164\\u3164\\u115F\\uFFA0"}]}';
+      expect(extractSmartSlideLinks(text)).toEqual([]);
+    });
+
+    it('removes invisible characters outside the Basic Multilingual Plane', () => {
+      // Tag characters (U+E0041, U+E0042) can carry invisible text.
+      const text = 'BBB{"links":[{"url":"https://example.com","label":"Docs\\uDB40\\uDC41\\uDB40\\uDC42"}]}';
+      expect(extractSmartSlideLinks(text)).toEqual([{ url: 'https://example.com/', label: 'Docs' }]);
+    });
+
+    it('keeps the joiners used by composed emoji and by several scripts', () => {
+      const family = '\u{1F468}\u200D\u{1F469}\u200D\u{1F467} Family';
+      const persian = '\u0645\u06CC\u200C\u062E\u0648\u0627\u0647\u0645';
+      expect(sanitizeLabel(family)).toBe(family);
+      expect(sanitizeLabel(persian)).toBe(persian);
+    });
   });
 
   describe('limits on untrusted slide text', () => {
@@ -243,7 +278,7 @@ describe('sanitizeLabel', () => {
     ['Line1\r\nLine2', 'Line1 Line2'],
     ['evil\u202Elive', 'evil live'],
     ['\u0000\u200F', ''],
-    ['Olá, mundo — ✓', 'Olá, mundo — ✓'],
+    ['Olá, mundo — ✓', 'Olá, mundo ✓'],
   ])('sanitizeLabel(%j) is %j', (label, expected) => {
     expect(sanitizeLabel(label)).toBe(expected);
   });

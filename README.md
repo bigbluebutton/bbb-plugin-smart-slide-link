@@ -4,7 +4,7 @@
 
 Turns links written on a presentation slide into buttons on the presentation toolbar. When
 the presenter shows a slide whose text contains the `BBB` marker followed by a links JSON,
-the plugin adds one toolbar button per link; clicking it opens the link in a new tab. The
+the plugin adds a toolbar button per link; clicking it opens the link in a new tab. The
 buttons change with the slide and disappear on slides without links.
 
 Write the links anywhere on the slide (the JSON may wrap over several lines):
@@ -21,12 +21,24 @@ BBB{"links": [
   (`https://user@host/`) or longer than 2048 characters.
 - Each button shows the link's label followed by the site it opens, e.g. `Open docs ↗
   example.com`. Slide text can hold links the presenter cannot see on the slide, so the
-  destination is always visible before clicking.
-- A slide shows at most 10 links, and labels longer than 40 characters are cut short.
-  Invisible and text-direction control characters are removed from labels.
+  destination is always visible before clicking. The button text is kept to 48
+  characters: a long site name is shortened from the left (`…ify-1234567890.evil.example`),
+  so the domain it belongs to stays visible, and the label gets the room left. The
+  button's tooltip shows the whole label and the url, e.g. `Open docs — open
+  https://example.com/docs in a new tab`, with the url cut short past 200 characters (never
+  inside the scheme and host) and wrapped after `/ ? & =`.
+- A slide shows at most 10 links. Up to 2 are toolbar buttons, as long as their texts add
+  up to at most 80 characters (the first link is always a button); the others are listed,
+  in the same form and order, in the presentation's options menu, and a `+N` button at the
+  end of the toolbar says how many there are and where (its tooltip, and a notification
+  when it is clicked). This keeps the slide controls on screen in a 1280px wide window with
+  the chat panel open; in narrower windows two long buttons can still push them off screen.
+- Labels longer than 40 characters are cut short. Invisible, control and text-direction
+  characters are removed from labels, and so are arrows and dashes, so a label cannot
+  imitate the `↗ site` part of the button or the `— open url` part of its tooltip.
 - Links open with `noopener,noreferrer`, so the opened page has no access to the meeting.
-- The presentation toolbar is shown to the presenter only, so only the presenter sees the
-  buttons, and only the presenter's client reads the slide text.
+- Only the presenter's client reads the slide text, so only the presenter sees the buttons
+  and the menu entries.
 - Slide text is read the way BigBlueButton extracts it (pdftotext), so the JSON must use
   plain straight quotes (`"`). Office apps that auto-replace them with typographic quotes
   (`“ ”`) produce text the plugin cannot parse.

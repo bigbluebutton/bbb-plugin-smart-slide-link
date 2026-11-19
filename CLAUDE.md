@@ -36,11 +36,12 @@ presentation toolbar buttons.
 ```
 useCurrentPresentation → slide textUri (+ sessionToken) → fetch → raw slide text
 raw slide text → extractSmartSlideLinks → SmartSlideLink[]
-SmartSlideLink[] → PresentationToolbarButton[] → setPresentationToolbarItems
+SmartSlideLink[] → splitToolbarLinks → toolbar: PresentationToolbarButton[] → setPresentationToolbarItems
+                                    → menu: PresentationDropdownOption[] → setPresentationDropdownItems
 ```
 
 - [src/index.tsx](src/index.tsx) — bootstraps React, reading `uuid` from the script element.
-- [src/components/smart-slide-link/component.tsx](src/components/smart-slide-link/component.tsx) — initializes `BbbPluginSdk`, wires the hooks and registers one toolbar button per link.
+- [src/components/smart-slide-link/component.tsx](src/components/smart-slide-link/component.tsx) — initializes `BbbPluginSdk`, wires the hooks and registers a toolbar button for each link that fits the toolbar (`splitToolbarLinks`: at most `MAX_TOOLBAR_LINKS` links and `MAX_TOOLBAR_TEXT_LENGTH` characters) and a presentation menu item for each of the others, plus a `+N` toolbar button that tells where those are (tooltip, and a client notification on click).
 - [src/components/smart-slide-link/hooks.ts](src/components/smart-slide-link/hooks.ts) — `useCurrentSlideText` (fetches the current slide's text; aborts stale requests; adds the session token, without which BBB 4.0 answers 401) and `useSmartSlideLinks`.
 - [src/components/smart-slide-link/service.ts](src/components/smart-slide-link/service.ts) — plain TS: finds the `BBB` marker (every occurrence), parses the links JSON, keeps only `http(s)` urls, opens links with `noopener,noreferrer`.
 - [src/commons/hooks.ts](src/commons/hooks.ts) — mandatory `plg_started`/`plg_stopped` usage logs, the `debug` setting → `pluginLogger.level()`, and the react-intl instance from `useLocaleMessages`.

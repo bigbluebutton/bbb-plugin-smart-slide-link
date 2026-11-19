@@ -1,3 +1,4 @@
 {
-  "smartSlideLink.button.tooltip": "Abrir {url} em uma nova aba"
+  "smartSlideLink.button.tooltip": "{label} — abrir {url} em uma nova aba",
+  "smartSlideLink.moreButton.tooltip": "{count, plural, one {Mais # link está} other {Mais # links estão}} no menu de opções da apresentação, no canto superior direito do slide"
 }
