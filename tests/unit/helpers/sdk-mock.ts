@@ -16,6 +16,19 @@ export function createSdkMock() {
     ) {
       Object.assign(this, props);
     }),
+    PresentationDropdownOption: vi.fn(function PresentationDropdownOption(
+      this: Record<string, unknown>,
+      props: Record<string, unknown>,
+    ) {
+      Object.assign(this, props);
+    }),
+    NotificationTypeUiCommand: {
+      INFO: 'info',
+      DEFAULT: 'default',
+      WARNING: 'warning',
+      SUCCESS: 'success',
+      ERROR: 'error',
+    },
     pluginLogger: {
       info: vi.fn(),
       debug: vi.fn(),
