@@ -27,7 +27,7 @@ describe('useSmartSlideLinks', () => {
     expect(result.current).toEqual([]);
 
     rerender({ t: SLIDE_A });
-    expect(result.current).toEqual([{ url: 'https://a.com', label: 'A' }]);
+    expect(result.current).toEqual([{ url: 'https://a.com/', label: 'A' }]);
   });
 
   it('recomputes when the presenter moves to another slide', () => {
@@ -35,7 +35,7 @@ describe('useSmartSlideLinks', () => {
       initialProps: { t: SLIDE_A },
     });
     rerender({ t: SLIDE_B });
-    expect(result.current).toEqual([{ url: 'https://b.com', label: 'B' }]);
+    expect(result.current).toEqual([{ url: 'https://b.com/', label: 'B' }]);
   });
 
   it('logs at debug level how many links a slide has, and nothing for a slide without links', () => {

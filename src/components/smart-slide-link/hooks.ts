@@ -1,18 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PluginApi, pluginLogger } from 'bigbluebutton-html-plugin-sdk';
 import { LOG_CODES } from '../../commons/constants';
+import { MAX_SLIDE_TEXT_LENGTH } from './constants';
 import { authenticateUrl, extractSmartSlideLinks } from './service';
 import { SmartSlideLink } from './types';
 
 /**
  * Returns the extracted text of the slide currently shown, or null while there is none, while
- * it loads, or when it could not be read.
+ * it loads, or when it could not be read. Only the presenter sees the presentation toolbar, so
+ * only the presenter's client fetches and parses the (untrusted) slide text.
  */
 export function useCurrentSlideText(pluginApi: PluginApi): string | null {
   const [slideText, setSlideText] = useState<string | null>(null);
   const { data: currentPresentation, loading, error } = pluginApi.useCurrentPresentation?.()
     ?? { loading: true };
-  const rawTextUri = loading || error
+  const isPresenter = pluginApi.useCurrentUser?.()?.data?.presenter === true;
+  const rawTextUri = !isPresenter || loading || error
     ? undefined
     : currentPresentation?.currentPage?.urlsJson?.text;
   const textUri = rawTextUri
@@ -39,7 +42,7 @@ export function useCurrentSlideText(pluginApi: PluginApi): string | null {
         return response.text();
       })
       .then((text) => {
-        if (!controller.signal.aborted) setSlideText(text);
+        if (!controller.signal.aborted) setSlideText(text.slice(0, MAX_SLIDE_TEXT_LENGTH));
       })
       .catch((fetchError: unknown) => {
         if (controller.signal.aborted) return;

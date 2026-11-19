@@ -3,6 +3,7 @@ import {
 } from 'vitest';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { PluginApi, pluginLogger } from 'bigbluebutton-html-plugin-sdk';
+import { MAX_SLIDE_TEXT_LENGTH } from '../../src/components/smart-slide-link/constants';
 import { useCurrentSlideText } from '../../src/components/smart-slide-link/hooks';
 
 vi.mock('bigbluebutton-html-plugin-sdk', async () => (await import('./helpers/sdk-mock')).createSdkMock());
@@ -11,10 +12,16 @@ interface PresentationState {
   textUri?: string;
   loading?: boolean;
   error?: object;
+  presenter?: boolean;
+  noCurrentUser?: boolean;
 }
 
 function makePluginApi(getState: () => PresentationState): PluginApi {
   return {
+    useCurrentUser: () => {
+      const { presenter = true, noCurrentUser = false } = getState();
+      return noCurrentUser ? undefined : { loading: false, data: { presenter } };
+    },
     useCurrentPresentation: () => {
       const { textUri, loading = false, error } = getState();
       return {
@@ -63,6 +70,20 @@ describe('useCurrentSlideText', () => {
       expect(fetchMock).not.toHaveBeenCalled();
     });
 
+    it('does not fetch the slide text for a user who is not the presenter', () => {
+      const pluginApi = makePluginApi(() => ({ textUri: 'https://bbb/slide.txt', presenter: false }));
+      const { result } = renderHook(() => useCurrentSlideText(pluginApi));
+      expect(result.current).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('does not fetch the slide text while the current user is unknown', () => {
+      const pluginApi = makePluginApi(() => ({ textUri: 'https://bbb/slide.txt', noCurrentUser: true }));
+      const { result } = renderHook(() => useCurrentSlideText(pluginApi));
+      expect(result.current).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
     it('logs and returns null when the presentation subscription fails', () => {
       const error = { message: 'boom' };
       const pluginApi = makePluginApi(() => ({ textUri: 'https://bbb/slide.txt', error }));
@@ -99,6 +120,32 @@ describe('useCurrentSlideText', () => {
         'https://bbb/textfiles/1?pageToken=p&sessionToken=tok',
         expect.anything(),
       );
+    });
+
+    it('starts fetching when the user becomes the presenter and drops the text when they stop', async () => {
+      fetchMock.mockResolvedValue(okResponse('Hello slide'));
+      let presenter = false;
+      const pluginApi = makePluginApi(() => ({ textUri: 'https://bbb/slide.txt', presenter }));
+
+      const { result, rerender } = renderHook(() => useCurrentSlideText(pluginApi));
+      expect(fetchMock).not.toHaveBeenCalled();
+
+      presenter = true;
+      rerender();
+      await waitFor(() => expect(result.current).toBe('Hello slide'));
+
+      presenter = false;
+      rerender();
+      expect(result.current).toBeNull();
+    });
+
+    it('keeps only the first part of an oversized slide text', async () => {
+      fetchMock.mockResolvedValue(okResponse('x'.repeat(MAX_SLIDE_TEXT_LENGTH + 1000)));
+      const pluginApi = makePluginApi(() => ({ textUri: 'https://bbb/slide.txt' }));
+
+      const { result } = renderHook(() => useCurrentSlideText(pluginApi));
+
+      await waitFor(() => expect(result.current).toHaveLength(MAX_SLIDE_TEXT_LENGTH));
     });
 
     it('logs and returns null when the fetch rejects', async () => {
