@@ -36,7 +36,7 @@ export function useCurrentSlideText(pluginApi: PluginApi): string | null {
 
     // A slower response for a previous slide must not overwrite the current slide's text.
     const controller = new AbortController();
-    fetch(textUri, { signal: controller.signal })
+    fetch(textUri, { signal: controller.signal, credentials: 'include' })
       .then((response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response.text();
