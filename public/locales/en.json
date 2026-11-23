@@ -1,0 +1,4 @@
+{
+  "smartSlideLink.button.tooltip": "{label} — open {url} in a new tab",
+  "smartSlideLink.moreButton.tooltip": "{count, plural, one {# more link is} other {# more links are}} in the presentation options menu, at the top right of the slide"
+}

@@ -40,5 +40,13 @@
     },
     "globals": {
       "browser": "writable"
-    }
+    },
+    "overrides": [
+      {
+        "files": ["tests/**/*.{ts,tsx}", "*.config.ts", "*.config.mts"],
+        "rules": {
+          "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
+        }
+      }
+    ]
   }
